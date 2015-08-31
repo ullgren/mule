@@ -4804,6 +4804,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="dynamicTemplateLoading" type="substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether or not to load the template for each message request. Settings this to true will result in the the template resource beeing loaded for each message. This allows for the location attribute to include expressions and for the resource content to change and be reloaded without having to restart the application. However it will also have a negative impact on performance. Default is 'false'.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

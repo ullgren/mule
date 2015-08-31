@@ -21,6 +21,7 @@ public class ParseTemplateTransformer extends AbstractMessageTransformer
 {
     private String location;
     private String template;
+    private boolean dynamicTemplateLoading = false;
 
     public ParseTemplateTransformer()
     {
@@ -32,40 +33,64 @@ public class ParseTemplateTransformer extends AbstractMessageTransformer
     public void initialise() throws InitialisationException
     {
         super.initialise();
-        loadTemplate();
+        // Load template if we are not to use dynamic template loading
+        if ( !dynamicTemplateLoading ) 
+        {
+            try
+            {
+                this.template = loadTemplate(this.location);
+            }
+            catch(Exception e)
+            {
+                throw new InitialisationException(e, this);
+            }
+        }
     }
 
-    private void loadTemplate() throws InitialisationException
+    private String loadTemplate(String templateLocation) throws Exception
     {
-        try
+        if(location == null)
         {
-            if(location == null)
-            {
-                throw new IllegalArgumentException("Location cannot be null");
-            }
-            template = IOUtils.getResourceAsString(location, this.getClass());
-
+            throw new IllegalArgumentException("Location cannot be null");
         }
-        catch(Exception e)
-        {
-            throw new InitialisationException(e, this);
-        }
+        return IOUtils.getResourceAsString(templateLocation, this.getClass());
     }
 
 
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        if(template == null)
+        String effectiveTemplate;
+        if ( this.dynamicTemplateLoading ) 
         {
-            throw new IllegalArgumentException("Template cannot be null");
+            // Load template for each message resolving any MEL expressions in the location
+            try  
+            {
+                String parsedLocation = muleContext.getExpressionManager().parse(this.location, message);
+                effectiveTemplate = loadTemplate(parsedLocation);
+            }
+            catch(Exception e)
+            {
+                throw new TransformerException(this, e);
+            }
+        } 
+        else 
+        {
+            if(template == null)
+            {
+                throw new IllegalArgumentException("Template cannot be null");
+            }
+            effectiveTemplate = this.template;
         }
-
-        return muleContext.getExpressionManager().parse(template, message);
+        return muleContext.getExpressionManager().parse(effectiveTemplate, message);
     }
 
     public void setLocation(String location)
     {
         this.location = location;
+    }
+
+    public void setDynamicTemplateLoading(boolean dynamicTemplateLoading) {
+        this.dynamicTemplateLoading = dynamicTemplateLoading;
     }
 }
