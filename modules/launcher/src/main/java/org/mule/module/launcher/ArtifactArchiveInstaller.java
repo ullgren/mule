@@ -28,14 +28,30 @@ public class ArtifactArchiveInstaller
 {
 
     protected static final String ANCHOR_FILE_BLURB = "Delete this file while Mule is running to remove the artifact in a clean way.";
+    protected static final String ARTIFACT_VERIFIER_CLASS_PROPERTY = "mule.artifactVerifier";
 
     protected transient final Log logger = LogFactory.getLog(getClass());
 
     private final File artifactParentDir;
+    private ArtifactResolver artifactResolver = new DefaultArtifactResolver();
 
     public ArtifactArchiveInstaller(File artifactParentDir)
     {
         this.artifactParentDir = artifactParentDir;
+        
+        if ( System.getProperty(ARTIFACT_VERIFIER_CLASS_PROPERTY) != null ) {
+        	 try {
+				Class<ArtifactResolver> artifactVerifierClazz = (Class<ArtifactResolver>) this.getClass().getClassLoader().loadClass(System.getProperty(ARTIFACT_VERIFIER_CLASS_PROPERTY));
+				
+				if ( ArtifactResolver.class.isAssignableFrom(artifactVerifierClazz)) {
+					this.artifactResolver = artifactVerifierClazz.newInstance();
+				} else {
+					logger.error("System property " + ARTIFACT_VERIFIER_CLASS_PROPERTY + " specifies a class (" + System.getProperty(ARTIFACT_VERIFIER_CLASS_PROPERTY) + ") that does not implement "+ ArtifactResolver.class.getCanonicalName());
+				}
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+				logger.error("System property " + ARTIFACT_VERIFIER_CLASS_PROPERTY + " specifies an invalid class " + System.getProperty(ARTIFACT_VERIFIER_CLASS_PROPERTY));
+			}
+        }
     }
 
     /**
@@ -75,9 +91,9 @@ public class ArtifactArchiveInstaller
 
             artifactName = FilenameUtils.getBaseName(fullPath);
             artifactDir = new File(artifactParentDir, artifactName);
-            // normalize the full path + protocol to make unzip happy
-            final File source = new File(artifactUrl.toURI());
 
+            final File source = this.artifactResolver.resolve(artifactUrl);
+            
             FileUtils.unzip(source, artifactDir);
             if ("file".equals(artifactUrl.getProtocol()))
             {
