@@ -28,7 +28,7 @@ public class ArtifactArchiveInstaller
 {
 
     protected static final String ANCHOR_FILE_BLURB = "Delete this file while Mule is running to remove the artifact in a clean way.";
-    protected static final String ARTIFACT_VERIFIER_CLASS_PROPERTY = "mule.artifactVerifier";
+    protected static final String ARTIFACT_RESOLVER_CLASS_PROPERTY = "mule.artifactResolver";
 
     protected transient final Log logger = LogFactory.getLog(getClass());
 
@@ -39,17 +39,17 @@ public class ArtifactArchiveInstaller
     {
         this.artifactParentDir = artifactParentDir;
         
-        if ( System.getProperty(ARTIFACT_VERIFIER_CLASS_PROPERTY) != null ) {
+        if ( System.getProperty(ARTIFACT_RESOLVER_CLASS_PROPERTY) != null ) {
         	 try {
-				Class<ArtifactResolver> artifactVerifierClazz = (Class<ArtifactResolver>) this.getClass().getClassLoader().loadClass(System.getProperty(ARTIFACT_VERIFIER_CLASS_PROPERTY));
+				Class<ArtifactResolver> artifactVerifierClazz = (Class<ArtifactResolver>) this.getClass().getClassLoader().loadClass(System.getProperty(ARTIFACT_RESOLVER_CLASS_PROPERTY));
 				
 				if ( ArtifactResolver.class.isAssignableFrom(artifactVerifierClazz)) {
 					this.artifactResolver = artifactVerifierClazz.newInstance();
 				} else {
-					logger.error("System property " + ARTIFACT_VERIFIER_CLASS_PROPERTY + " specifies a class (" + System.getProperty(ARTIFACT_VERIFIER_CLASS_PROPERTY) + ") that does not implement "+ ArtifactResolver.class.getCanonicalName());
+					logger.error("System property " + ARTIFACT_RESOLVER_CLASS_PROPERTY + " specifies a class (" + System.getProperty(ARTIFACT_RESOLVER_CLASS_PROPERTY) + ") that does not implement "+ ArtifactResolver.class.getCanonicalName());
 				}
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-				logger.error("System property " + ARTIFACT_VERIFIER_CLASS_PROPERTY + " specifies an invalid class " + System.getProperty(ARTIFACT_VERIFIER_CLASS_PROPERTY));
+				logger.error("System property " + ARTIFACT_RESOLVER_CLASS_PROPERTY + " specifies an invalid class " + System.getProperty(ARTIFACT_RESOLVER_CLASS_PROPERTY));
 			}
         }
     }
