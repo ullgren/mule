@@ -18,6 +18,12 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.FilenameUtils;
 
+/**
+ *  This is an example of a ArtifactResolver that also includes some verification 
+ *  logic. In this case it checks that the artifact contains a file called MagicFile 
+ *  before allowing it to be deployed.
+ *
+ **/
 public class MarkerFileVerifyingArtifactResolver extends DefaultArtifactResolver {
 	
 	protected transient final Log logger = LogFactory.getLog(getClass());
