@@ -41,10 +41,10 @@ public class ArtifactArchiveInstaller
         
         if ( System.getProperty(ARTIFACT_RESOLVER_CLASS_PROPERTY) != null ) {
         	 try {
-				Class<ArtifactResolver> artifactVerifierClazz = (Class<ArtifactResolver>) this.getClass().getClassLoader().loadClass(System.getProperty(ARTIFACT_RESOLVER_CLASS_PROPERTY));
+				Class<?> artifactResolverClazz = this.getClass().getClassLoader().loadClass(System.getProperty(ARTIFACT_RESOLVER_CLASS_PROPERTY));
 				
-				if ( ArtifactResolver.class.isAssignableFrom(artifactVerifierClazz)) {
-					this.artifactResolver = artifactVerifierClazz.newInstance();
+				if ( ArtifactResolver.class.isAssignableFrom(artifactResolverClazz)) {
+					this.artifactResolver = (ArtifactResolver) artifactResolverClazz.newInstance();
 				} else {
 					logger.error("System property " + ARTIFACT_RESOLVER_CLASS_PROPERTY + " specifies a class (" + System.getProperty(ARTIFACT_RESOLVER_CLASS_PROPERTY) + ") that does not implement "+ ArtifactResolver.class.getCanonicalName());
 				}

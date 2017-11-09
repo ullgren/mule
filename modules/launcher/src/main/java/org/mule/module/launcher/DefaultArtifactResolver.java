@@ -9,6 +9,11 @@ package org.mule.module.launcher;
 import java.io.File;
 import java.net.URL;
 
+/**
+ * The default artifact resolver mimics the traditional behaviour of 
+ * Mule runtime and creates a {@link File} object from the given {@link URL}.
+ *
+ */
 public class DefaultArtifactResolver implements ArtifactResolver {
 
 	@Override

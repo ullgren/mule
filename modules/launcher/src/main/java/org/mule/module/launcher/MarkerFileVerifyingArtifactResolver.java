@@ -13,10 +13,11 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.FilenameUtils;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  *  This is an example of a ArtifactResolver that also includes some verification 
@@ -26,7 +27,7 @@ import org.mule.util.FilenameUtils;
  **/
 public class MarkerFileVerifyingArtifactResolver extends DefaultArtifactResolver {
 	
-	protected transient final Log logger = LogFactory.getLog(getClass());
+	protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
 	public File resolve(URL artifactUrl) throws Exception {
