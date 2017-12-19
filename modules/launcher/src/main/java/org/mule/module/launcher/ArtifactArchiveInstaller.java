@@ -97,8 +97,7 @@ public class ArtifactArchiveInstaller
                 throw new IOException("Cannot delete existing folder " + artifactDir);
             }
 
-            // normalize the full path + protocol to make unzip happy
-            final File source = new File(artifactUrl.toURI());
+            final File source = this.artifactResolver.resolve(artifactUrl);
 
             FileUtils.unzip(source, artifactDir);
             if ("file".equals(artifactUrl.getProtocol()))
